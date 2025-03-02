@@ -67,3 +67,11 @@ Each layer solves a specific set of problems. By adding them up we create the ab
 <br />
 
 Our application sits in layer 5 (L5) and produces messages based on what it does for the user. Messages are passed to the lower layer which adds a header to the message. This header contains information required by the same protocol in other hosts for the correct handling of the message. The message is then forwarded to the lower layer which encapsulates further by adding its own header. The message goes down the stack being incapsulated recursively until it reaches the hardware and its bits are sent off. During transit over the network, intermediate devices (such as switches and routers) will unpack the message in reverse order to get the information necessary for forwarding it to its destination. When the message finally reaches the destination host, it is unpacked all the way up to the application layer, where the destination application is operating.
+
+## Join the Discussion!
+Have questions or feedback for me? Feel free to pop in my discord
+
+<br />
+<br />
+
+[Join the Discord Server](https://discord.gg/5rtC3FTU)
