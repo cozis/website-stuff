@@ -1,6 +1,6 @@
 # Building web apps from scratch - Getting Started - Part 0
 
-I've always been fascinated by how web applications work. After spending the past few years diving how they are build, I thought it would be fun to share what I've learned! In this series of posts, we'll build a social network-like website from scratch. Think of it as a journey where we'll explore how all the pieces fit together. By the end, you'll have a fully functional website ready for real users!
+In the past few years, I had som fun studying how web apps are built from the ground up. It's been a great journey so I decided to share what I learned by making a series of posts showing how one can build a web app from scratch. We will build a simple social network featuring posting articles and following other users. If you follow along, by the end you'll have a fully functional website ready for real users!
 
 <br/>
 <br/>
@@ -18,8 +18,8 @@ but we can worry about that later.
 ## Prerequisites
 
 To follow along, you will need:
-* A good grasp of C programming: there is a lot to cover and I won't be able to delve into the details of everything, not at first at least. I plan on accompanying the main posts with secondary posts explaining the things I had to gloss over.
-* You should have an idea of how HTTP works: what is a request, a response, and their general syntex.
+* A good grasp of C programming
+* An idea of how HTTP works: what is a request, a response, and their general syntax.
 
 ## Environment Setup
 
@@ -42,9 +42,11 @@ WSL is harder to set up, but you will have access to the tools I listed above. A
 
 If you still want to go native, then you should download [w64devkit](https://github.com/skeeto/w64devkit), which is is an unix-like environment for Windows built by the awesome author of [nullprogram.com](https://nullprogram.com/). It contains `gcc`, `gdb`, `make` and some other utilities.
 
-## The Roadmap
+## Roadmap
 
-The project will be divided 3 parts:
-* **Section 1**: we will create a simplified yet complete version of our application. This will include a **blocking web server**, the **database**, and **no encryption**.
-* **Section 2**: we will improve our web server by making it **non-blocking**.
-* **Section 3**: we will add **encryption**.
+We will start by building a **blocking web server** with the **socket interface** provided by the operating system. We will then add a **database** and implement the first version of our application. You could host this version online, but only as a test, since there will be **no encryption**. Then, we will reaorganize our server to make it **non-blocking**, greatly increasing how many requests the server can handle at a given time. Finally, we will add encryption.
+
+<br/>
+<br/>
+
+But before all of that, I decided to offer an overview of how networks work. This will give you a sense of what the OS is doing for us. So in the [next post](001_the_network_stack.html) we will go over the general structure of the internet and the protocols it uses.

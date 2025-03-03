@@ -14,9 +14,12 @@ shutil.copyfile("source/projects.html", "generated/projects.html")
 
 post_path = "."
 md_files = [f for f in listdir(post_path) if isfile(join(post_path, f)) and splitext(f)[1] == ".md"]
-print(md_files)
 
 for md_file in md_files:
+
+	if md_file == "README.md":
+		continue
+
 	html_file = f"generated/posts/{splitext(md_file)[0]}.html"
 
 	template_header, template_footer = open("source/post_template.html").read().split("@content")
@@ -24,3 +27,5 @@ for md_file in md_files:
 	open(html_file, "a").write(template_header)
 	system(f"smu {md_file} >> {html_file}")
 	open(html_file, "a").write(template_footer)
+
+	print("Generated", html_file)
