@@ -44,7 +44,7 @@ If you still want to go native, then you should download [w64devkit](https://git
 
 ## Roadmap
 
-We will start by building a **blocking web server** with the **socket interface** provided by the operating system. We will then add a **database** and implement the first version of our application. You could host this version online, but only as a test, since there will be **no encryption**. Then, we will reaorganize our server to make it **non-blocking**, greatly increasing how many requests the server can handle at a given time. Finally, we will add encryption.
+We will start by building a **blocking web server** with the **socket interface** provided by the operating system. We will then add a **database** and implement the first version of our application. You could host this version online, but only as a test, since there will be **no encryption**. Then, we will reorganize our server to make it **non-blocking**, greatly increasing how many requests the server can handle at a given time. Finally, we will add encryption.
 
 <br/>
 <br/>

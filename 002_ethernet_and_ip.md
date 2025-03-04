@@ -1,6 +1,6 @@
 # Building web apps from scratch - Ethernet and IP - Part 2
 
-In these posts we'll cover the lower layers of the network stack: the data-link and network layers! These include the ethernet and IP protocol. We skipped the hardware layer because I know nothing about it. I'm sure there is a lot going on there though!
+In this post we'll continue our peek into the operating system's network stack! We will talk about the data-link and network layers, where the ethernet and IP protocols are located.
 
 ## Layer 2: The Data-Link Layer
 We call layer 2 the data-link layer. Protocols at this layer, such as ethernet or wifi, manage the communication within LANs. Here messages are referred to as frames, which have a relatively small size that depends on the technology being used. For instance most ethernet frames are 1518 bytes.
@@ -8,10 +8,11 @@ We call layer 2 the data-link layer. Protocols at this layer, such as ethernet o
 <br />
 <br />
 
-As we mentioned in the network stack post, hosts of a LAN are essentially directly connected with one another (one hop away, as they say). This greatly simplifies the problem of sending messages to their destinations. Each host is assigned a MAC address which uniquely identifies it. When a frame is sent, the destination MAC is stored in the header. The frame will be visible to all the participants of the network, but only the one with the destination MAC will pick it up.
+As we mentioned in the previous post, hosts of a LAN are essentially directly connected with one another (one hop away, as they say). This greatly simplifies the problem of sending messages to their destinations. 
 
-<br />
-<br />
+Each host is assigned a MAC address, a 6 byte code which uniquely identifies it. Frames are sent with the MAC address of the destination host in their header. All hosts of the network that read the frame inspect the header and only pick it up if the MAC address matches their own.
+
+## Collisions and Exponential Backoff
 
 One problem that is solved at this layer is collisions. It is possible for hosts to send frames at the same time on a single link, causing them to get all messed up. Hosts must have a way to detect and avoid/recover from such events. This is a fascinating topic, since it requires the hosts to synchronize without being able to communicate.
 
@@ -20,8 +21,7 @@ One problem that is solved at this layer is collisions. It is possible for hosts
 
 Ethernet solves collisions with exponential backoff, essentially relying on randomness. When a host sends a frame, it also listens to what is being sent. If what is read doesn't match, a collision occurred and it stops sending. The colliding hosts wait a random time before trying again, within a certain limit (of course being random each host will likely wait a different time). If a host collides a second time, it doubles the time limit it's allowed to wait and chooses a random time again. This goes on until no collision occurs. This process may go on indefinitely, but in practice is resolves quickly. With each collision the probability of collision goes down exponentially.
 
-<br />
-<br />
+## Ethernet Frames
 
 The format of a frame depends on the L2 protocol, but in general they have header, payload, and footer. Ethernet frames look like this:
 ```
