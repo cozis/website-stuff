@@ -156,7 +156,7 @@ When a packet is fragmented: all the fragments share the larger packet's ID, the
 Fragmentation isn't very popular. Host always try to produce IP packets that fit in single frames, and routers prefer to drop them if forwarding isn't possible. This behavior in routers can be forced by setting the `DF` (don't fragment) flag.
 
 ## What's next
-In the next post, we'll learn about the transport protocols: TCP and UDP.
+In the [next posts](003_tcp.html), we'll learn about the transport protocols, with a focus on TCP.
 
 ## Join the Discussion!
 Have questions or feedback for me? Feel free to pop in my discord
@@ -164,4 +164,4 @@ Have questions or feedback for me? Feel free to pop in my discord
 <br />
 <br />
 
-[Join the Discord Server](https://discord.gg/5rtC3FTU)
+[Join the Discord Server](https://discord.gg/vCKkCWceYP)

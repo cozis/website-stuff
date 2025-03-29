@@ -67,4 +67,4 @@ Have questions or feedback for me? Feel free to pop in my discord
 <br />
 <br />
 
-[Join the Discord Server](https://discord.gg/5rtC3FTU)
+[Join the Discord Server](https://discord.gg/vCKkCWceYP)

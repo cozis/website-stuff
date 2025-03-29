@@ -1,6 +1,6 @@
 # Building web apps from scratch - Getting Started - Part 0
 
-In the past few years, I had some fun studying how web apps are built from the ground up. It's been a great journey so I decided to share what I learned by making a series of posts showing how one can build a web app from scratch. We will build a simple social network featuring posting articles and following other users. If you follow along, by the end you'll have a fully functional website ready for real users!
+In the past few years, I had some fun studying how web apps are built from the ground up. It's been a great journey, so I decided to share what I learned by making a series of posts showing how one can build a web app from scratch. We will build a simple social network featuring posting articles and following other users. If you follow along, by the end you'll have a fully functional website ready for real users!
 
 <br/>
 <br/>
@@ -10,7 +10,7 @@ This is the first time undertaking such an ambitious project, so I welcome any f
 <br/>
 <br/>
 
-We'll be using the C programming language for everything, since it's low level enough to do things efficiently and not very opinionated. The libraries we will use are:
+We'll be using the C programming language for everything, since it's low level enough to do things efficiently and not very opinionated. The libraries we will be using:
 * [BearSSL](https://bearssl.org/) for encryption
 * [SQLite](https://www.sqlite.org/) as database
 but we can worry about that later.
