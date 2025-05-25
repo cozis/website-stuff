@@ -1,6 +1,6 @@
 # String Parsing Patterns
 
-Over the years, I came up with several patterns for parsing strings without a tokenization step. I found that following this patterns consciously made it easy to write robust string parsing code.
+Over the years, I came up with several patterns for parsing strings without a tokenization step. I found that following these patterns consciously made it easy to write robust string parsing code.
 
 <br />
 <br />
@@ -9,7 +9,7 @@ In this post I'll list them and show how to use them to make a simplified JSON p
 
 ## General Structure
 
-Lets assume `char *src` is a string of length `int len` we want to extract information from. We will use the `int cur` cursor variable to keep track of how many characters we already inspected from the string. The cursor is such that `src[cur]` is the next character that hasn't been inspected yet. If `cur == len`, all characters have been inspected. Note that I sometimes refer to inspecting characters as "skipping" or "consuming" them.
+Let's assume `char *src` is a string of length `int len` we want to extract information from. We will use the `int cur` cursor variable to keep track of how many characters we already inspected from the string. The cursor is such that `src[cur]` is the next character that hasn't been inspected yet. If `cur == len`, all characters have been inspected. Note that I sometimes refer to inspecting characters as "skipping" or "consuming" them.
 
 ## Consuming an Optional Sequence
 
@@ -130,7 +130,7 @@ this is because `len - cur` can never underflow, while `cur+2` may overflow. Thi
 
 ## Parsing Strings
 
-What if we want to not only consume characters, but extract information from the source string? Fear not! We can easily use our previous lessons for this. Lets say we want to parse a string in the form `<spaces> <name> <spaces> <nickname>`:
+What if we want to not only consume characters, but extract information from the source string? Fear not! We can easily use our previous lessons for this. Let's say we want to parse a string in the form `<spaces> <name> <spaces> <nickname>`:
 
 ```c
 int off;
