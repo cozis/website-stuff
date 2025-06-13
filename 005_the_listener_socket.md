@@ -1,6 +1,6 @@
 # Building web apps from scratch - The Listener Socket - Part 5
 
-Now that we have a pretty good handle of how the HTTP protocol works, we can start with the implementation. The way we will go about this is to first set up a plain TCP echo server using system calls and document step by step what everything does (an echo server is one that repeats back any message it receives). Then, we will use this generic TCP server to actually process HTTP requests and serve responses. In this post we will talk about setting up a listening socket.
+Now that we have a pretty good handle on how the HTTP protocol works, we can start with the implementation. The way we will go about this is to first set up a plain TCP echo server using system calls and document step by step what everything does (an echo server is one that repeats back any message it receives). Then, we will use this generic TCP server to actually process HTTP requests and serve responses. In this post we will talk about setting up a listening socket.
 
 <br />
 <br />
@@ -9,7 +9,7 @@ The code snippets used here are Linux-specific. The general points also apply to
 
 ## Creating a Socket
 
-First, we need to create a "socket" object to tell the server we are interested in accepting TCP connections on a given interface and port. This is done using the `socket()` function:
+First, we need to create a "socket" object to tell the system we are interested in accepting TCP connections on a given interface and port. This is done using the `socket()` function:
 
 ```c
 int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -33,11 +33,22 @@ The third argument specifies which stream-oriented protocol we are going to use 
 <br />
 <br />
 
-The return value is an integer that describes the socket object which is stored in the operating system's kernel, or -1 if the function failed.
+The return value is an integer that identifies the socket object which is stored in the operating system's kernel, or -1 if the function failed.
+
+## Enabling Address Reuse (optional)
+
+This is an optional step helpful while developing servers. When a TCP connection that uses a given local address and port pair is terminated, the actively closing end enters the TIME-WAIT state (see [RFC 9293](https://datatracker.ietf.org/doc/html/rfc9293#name-state-machine-overview)) where no new connections can be established on the interface/port pair to let any residual network traffic related to it settle. This is extremely annoying when developing a server because it means you'll have to wait a couple minutes between runs. If you run the server before then, you'll get an "Address already in use" error. To avoid this, you can set the address reuse option on the socket:
+
+```c
+int one = 1;
+setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &one, sizeof(one));
+```
+
+This will set the `SO_REUSEADDR` setting to 1 for this socket.
 
 ## Binding to the Local Interface
 
-We created a socket but it's still not doing anything as we need to configure it first. We can start by telling the OS which interface and port pair we want to listen on. We do so using the `bind()` function.
+We created a socket, but it's not doing anything yet since we need to configure it first. We can start by telling the OS which interface and port pair we want to listen on. We do so using the `bind()` function.
 
 ```c
 // We want to listen for connections on this interface and port
@@ -55,7 +66,7 @@ if (bind(listen_fd, (struct sockaddr*) &bind_buf, sizeof(bind_buf)) < 0) {
 	return -1;
 }
 ```
-The way this works is by filling out the `struct sockaddr_in` structure with our parameters and then pass that to `bind()`. If we were using a different L3 protocol such as IPv6 we would be using a different address structure here.
+This works by filling out the `struct sockaddr_in` structure with our parameters and then pass that to `bind()`. If we were using a different L3 protocol such as IPv6 we would be using a different address structure here.
 
 <br />
 <br />
@@ -83,11 +94,11 @@ The way to set the `sin_port` field is by first converting the port value from h
 <br />
 <br />
 
-Setting the `sin_addr` field is a bit trickier as we usually specify IPv4 addresses in dot-decimal form. That's why we rely on the standard `inet_pton` function to convert the string to the raw 4 byte address. The resulting value already has the correct byte ordering here. The first argument `inet_pton` specifies which address format it should parse. For dot-decimal we pass it AF_INET. The second argument is the actuall null-terminated string. The last argument is the memory location where the address's 32 bits would be written to. The return value is 1 on success and 0 or -1 on failure.
+Setting the `sin_addr` field is a bit trickier as we usually specify the IPv4 addresses in dot-decimal form. That's why we rely on the standard `inet_pton` function to convert the string to the raw 4 byte address. The resulting value already has the correct byte ordering here. The first argument `inet_pton` specifies which address format it should parse. For dot-decimal we pass it AF_INET. The second argument is the actual null-terminated string. The last argument is the memory location where the address's 32 bits would be written to. The return value is 1 on success and 0 or -1 on failure.
 
 ## Listening for Connections
 
-Now we can "activate" our socket by calling the `listen()` function. This will tell the OS to start performing the three-way handshakes and save up the established connections in a backlog. After that we will be able to get connections from that backlog to our application by calling the `accept()` function:
+Now we can "activate" our socket by calling the `listen()` function. This will tell the OS to start performing the three-way handshakes and store the established connections in a backlog. After that we will be able to get connections from that backlog to our application by calling the `accept()` function:
 
 ```c
 if (listen(listen_fd, 32) < 0) {
@@ -146,6 +157,9 @@ int main(void)
 	if (listen_fd == INVALID_SOCKET) {
 		return -1;
 	}
+
+	int one = 1;
+	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &one, sizeof(one));
 
 	// We want to listen for connections on this interface and port
 	char addr[] = "127.0.0.1";
