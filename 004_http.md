@@ -1,57 +1,118 @@
 # Building web apps from scratch - HTTP - Part 4
 
-With the last post we finished covering how the OS offers userspace applications the abstraction of safe channels for the transmission of bytes. Applications use this abstraction to implement their own use case-specific protocols. One of these is HTTP.
+With this last post we completed our tour into the kernel's network stack, so now we can chill a bit and reduce the pace! The TCP protocol and the ones beneath it offer the abstraction of a reliable transport of byte streams. Applications can then leverage this abstraction to implement application-specific protocols. The most widely used application-level protocol is HTTP given how it powers the web. The remaining part of this series will basically cover all aspects of HTTP, so instead of listing all of its features in a single post, I will introduce them as needed while building our application. This post will cover HTTP's basic syntax and other things that tech-savvy people will probably be already familiar with. Regardless I'll state things explicitly to make sure we are on the same page!
 
-HTTP is probably the most used L5 protocol given how it powers the web. For this reason it has evolved a lot over time. The first version was developed at CERN and extremely simple. Later on we standardized it and called it 0.9, even though it's not really used in practice. The first widely used HTTP version was 1.0, which then was extended making version 1.1. There are also HTTP version 2 and 3 which work very differently from 1.x.
+## A bit of history
 
-In this post I'd like to talk about HTTP 1.0, then we may extend our server to support 1.1 in the future. We won't go too deep into it since we'll have ample opportunities to talk specifics while implementing the protocol. For now I just wanted to give a feel of how the protocol looks like and behaves. Note that the HTTP specification can be found at [https://www.rfc-editor.org/rfc/rfc1945.html](https://www.rfc-editor.org/rfc/rfc1945.html). This is just a very light overview of that document.
-
-Generally speaking, HTTP is used to transfer resources from a host called "server", to a host called "client". This exchange is initiated by the client opening a TCP connection to the server (which is already listening on a specific port, usually port 80) and sending an HTTP request message over it, which includes the name of the resource being requested. The server in turn either responds with the resource contents or a failure response. The TCP connection is then closed.
-
-## Request
-
-Unlike the other lower level protocols, HTTP uses text-based messages (ASCII to be specific). So this is what a request looks like:
+The *HyperText Transfer Protocol* (HTTP) protocol was originally designed at CERN to share documents between network nodes. The idea is that some machines called "servers" would catalog files, and "clients" would be able to download these files based on their names. These files were intended to be in the HTML format, which essentially allows adding to documents references to other documents:
 
 ```
-GET / HTTP/1.0\r\n
-Host: coz.is\r\n
-User-Agent: curl/7.81.0\r\n
+<html>
+	<body>
+		I'm a very important document!
+		<a href="http://server.com/other_very_important_document.html">link to other very important document</a>
+	</body>
+</html>
+```
+
+this is an example of an HTML document that references some other document using the `<a>` tag. Note that the HTML syntax may have been different at the time! The addition of "links" is what made these text documents "hyper". The idea is that users would be able to navigate the graph of documents distributed over the network by leveraging HTTP. Each document would contain links to other related documents, and upon clicking on the links a new HTTP request would be performed under the hood to then visualize the referenced document.
+
+With time HTTP was adopted for things other than scientific research, slowly turning it into a more general application delivery platform. Today we don't think about webpages as textual documents but as applications.
+
+Later on HTTP was standardized and version 1.0 was born. The original version was called 0.9 but isn't in use anymore. Over the years with its wide adoption the protocol was improved, introducing version 1.1, 2.0, 3.0. In this series we will start with HTTP 1.0 and then move to HTTP 1.1 when making our server non-blocking.
+
+You can find the HTTP 1.0 standard at [https://www.rfc-editor.org/rfc/rfc1945.html](https://www.rfc-editor.org/rfc/rfc1945.html).
+
+## The HTTP Exchange
+
+At its core, HTTP consists in transferring a blob of bytes with some optional attributes from a server to the client machine. The exchange is initiated by the client, which sends an **HTTP request** message:
+
+```
+GET very_important_document.txt HTTP/1.0\r\n
+Accept-Language: en\r\n
 \r\n
 ```
 
-First of all, HTTP messages are composed of a list of lines separated by a carriage return character and a new line character which are represented here as \r and \n respectively.
-
-The first line, usually referred to as "request line", contains the request method "GET", the resource name "/" and the HTTP version. Then, follow a variable number of "header fields" also commonly referred as "headers". Each header field is made up by a name and a value, separated by the colon character. Then comes an empty new line which signifies the end of the message.
-
-The GET method is used to get resources from the server, but the client can also send data to it. In HTTP 1.0 this is done using the POST method:
-
-```
-POST / HTTP/1.0\r\n
-Host: coz.is\r\n
-User-Agent: curl/7.81.0\r\n
-Content-Length: 13\r\n
-\r\n
-Hello, world!
-```
-
-This request is actually sending the "Hello, world!" string to the server. The payload of the request comes after the empty line which signifies the end of the header fields. How many bytes are being sent is specified by the "Content-Length" header field. It may seem strange, but POST requests also refer to a resource, in this case "/". This tells the server what it should do with that data.
-
-The third HTTP 1.0 method is HEAD, which behaves as GET but tells the server to omit the response body. This tells the client which header fields the server would send if the client made a GET request.
-
-## Response
-
-A possible HTTP 1.0 response to the request could be something like this:
+the request contains the name of a resource that is expected to be stored on the server and some additional request modifiers. The server then responds with the requested resources or an error. Here are examples of possible responses:
 
 ```
 HTTP/1.0 200 OK\r\n
-Content-Length: 22\r\n
+Content-Length: 168\r\n
 \r\n
-Hello from the server!
+<html>
+	<body>
+		I'm a very important document!
+		<a href="http://server.com/other_very_important_document.html">other very important document</a>
+	</body>
+</html>
 ```
 
-the only difference is in the first line, called "status line". Unlike the request line, the HTTP version comes first. Then follows the status code, a three digit code which describes the type of response being sent. The status code is followed by a human-readable message that's usually ignored by clients.
+```
+HTTP/1.0 404 Not Found\r\n
+Content-Length: 49\r\n
+\r\n
+This resource doesn't exist on the server. Sorry!
+```
 
-Status codes for HTTP 1.0 are standardized and are available at [https://www.rfc-editor.org/rfc/rfc1945.html#section-6.1.1](https://www.rfc-editor.org/rfc/rfc1945.html#section-6.1.1). They are divided into categories based on the first digit:
+The HTTP protocol doesn't really dictate what underlying L4 protocol should be used, but in most cases it will be TCP. In HTTP 1.0 the request will be preceded by a TCP SYN segment to establish a connection and the response will be followed by a FIN segment to tear it down.
+
+## The HTTP Request
+
+### Syntax
+
+Now let's focus on the HTTP request:
+
+```
+GET very_important_document.txt HTTP/1.0\r\n
+Accept-Language: en\r\n
+\r\n
+```
+
+An HTTP message is split into lines using the special characters carriage return and newline, respectively indicated here with \r and \n. The first line of a request is called "request line", and specifies the request method, the resource name, and HTTP version. The request method essentially indicates if the request is download or uploading data (I didn't mention it earlier but clients may also upload data to servers). You can think of the resource name as the path of a file, except the underlying resource may be something other than a file. For instance a server could have a resource "sensor_data.bin" which is associated to a function that collects sensor data in real time.
+
+In HTTP 1.0, the request methods can be GET, HEAD, or POST. The GET request is used to download a resource from a server. HEAD behaves like GET by asking the server to send a resource over, but the actual payload should not be sent. It's useful to see which headers the server would send for a given resource. The POST method is used for sending form submissions or file uploads.
+
+The request line is then followed by zero or more header fields, a list of (name,value) pairs separated by a colon. These fields can either add information to how the HTTP exchange must happen or about the request payload. For instance in this example the "Accept-Language" header tells the server that it should serve content in english.
+
+The header list is terminated with an empty line. The request line and header fields make up the "request head". If the request contains some payload, it will be sent after the empty line. Note that a request head is always terminated by the \r\n\r\n sequence: the first \r\n terminates the last header field and the second \r\n is the empty line. If present, the size of the payload can be inferred from the header fields.
+
+## The HTTP Response
+
+Responses are very similar to requests. The only difference is the first line. Instead of the request line, responses have the "status line":
+
+```
+HTTP/1.0 200 OK\r\n
+Content-Length: 168\r\n
+\r\n
+<html>
+	<body>
+		I'm a very important document!
+		<a href="http://server.com/other_very_important_document.html">other very important document</a>
+	</body>
+</html>
+```
+
+In the status line first comes the version, then the status code, and then a human readable string describing the status called "reason phrase". Everything else looks like a request.
+
+Status codes are listed in the standard alongside a possible reason phrase for it:
+
+* 200 OK
+* 201 Created
+* 202 Accepted
+* 204 No Content
+* 301 Moved Permanently
+* 302 Moved Temporarily
+* 304 Not Modified
+* 400 Bad Request
+* 401 Unauthorized
+* 403 Forbidden
+* 404 Not Found
+* 500 Internal Server Error
+* 501 Not Implemented
+* 502 Bad Gateway
+* 503 Service Unavailable
+
+Status codes always have 3 digits and can be grouped based on the first one:
 
 * 1xx: Informational responses (not used in HTTP 1.0)
 * 2xx: Success responses
@@ -59,10 +120,13 @@ Status codes for HTTP 1.0 are standardized and are available at [https://www.rfc
 * 4xx: Client error responses
 * 5xx: Server error responses
 
-So for instance if a client requested a resource which does not exist on the server, the response status code would be in the 4xx family. If the response failed because the server crashed or some other internal error, then a 5xx status code would be used. If the resource is present but changed location, a 3xx response would be generated with the new location described by one of its headers. If the response succeeded, then a 2xx code would be used as in our previous example.
+## What's next
+In the next post we'll finally start implementing our server. We will go over the functions required to set up the TCP layers.
 
-## HTTPS
+## Join the Discussion!
+Have questions or feedback for me? Feel free to pop in my discord
 
-These days we usually use HTTPS instead of plain HTTP. HTTPS is a secure version of HTTP (the "S" stands for "secure"). HTTPS works by encrypting all messages before sending them over TCP and by decrypting all messages received over TCP. The encrypted/decrypted messages are just regular HTTP messages as we saw before. This makes sure the communication is both confidential and that the messages we are receiving are actually coming from who we expect.
+<br />
+<br />
 
-The encryption/decryption protocol used is called TLS, which is a newer version of the SSL protocol. Other than encrypting and decrypting it also handles authentication and key exchanges between peers.
+[Join the Discord Server](https://discord.gg/vCKkCWceYP)
