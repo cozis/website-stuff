@@ -18,7 +18,9 @@ These issues wouldn't normally be too problematic. After all, it's a compromise 
 
 ## Dependency Graph Degradation
 
-But why do dependency graphs grow so quickly? Let's take a generic library A. Due to the benefits of code reuse, A's developer uses libraries B and C
+But why do dependency graphs grow so quickly?
+
+Let's take a generic library A. Due to the benefits of code reuse, A's developer uses libraries B and C
 
 ```
   A
@@ -58,4 +60,4 @@ Given this model the "dependencies are bad" heuristic makes more sense as you al
 
 ## Conclusion
 
-So what can we do about this? First, we must reconsider the value of dependencies. They work well for small projects, but things start falling apart when scaling to larger projects. Vendoring and bundling help mitigate some problems, but I think most of the value will come by being less afraid of solving problems directly. If you do software development for a living, don't shy away from trying to solve hard problems yourself. If you do end up deciding that you need to use someone else's library, you will be much more knowledgeable of what it is doing for you. And there is an additional benefit: in time, you'll improve your ability to solve hard problems.
+The root cause of this situation is assuming that code reuse has no downsides. The costs outweigh the benefits as projects grow larger. There needs to be a mindset shift from "I know a library for that" to first trying to solve problems yourself, and then looking for someone else's solution if necessary. If you do choose to add a dependency, you'll have a much better idea of what it's doing for you.
