@@ -56,13 +56,13 @@ H   I   J   K   L   M   N   O
 
 In this example, the cost of dependencies grows exponentially as we add layers, doubling each time. But each node is only aware of what's beneath it, so they have no information of how much their dependencies are costing to the actual root program.  This is quite a simplistic and pessimistic example as nodes are often shared, but I think it shows the underlying principle that causes dependency graphs to grow.
 
-Given this model the "dependencies are bad" heuristic makes more sense as you always design for the worst case.
+Given this model, the "dependencies are bad" heuristic makes more sense as you always design for the worst case.
 
 ## Why the Divide?
 
 But why do people in different communities have so different perceptions of the situation?
 
-I think programmers in the C and C++ communities are much more exposed to the problem due to how costly each dependency is and that there is no form of dependency encapsulation. When you use a library, you need to learn about its dependencies ad manually add them to the build process.
+I think programmers in the C and C++ communities are much more exposed to the problem due to how costly each dependency is and that there is no form of dependency encapsulation. When you use a library, you need to learn about its dependencies and manually add them to the build process.
 
 On the other hand, the Python and Javascript communities have tools for that which greatly reduce the management cost. This makes adding dependencies to your project nearly effortless and the low resistance route whenever a problem comes up. As the software ecosystem grows, the network of dependencies does too, so that when things go wrong, [they go really wrong](https://en.wikipedia.org/wiki/Npm_left-pad_incident).
 
@@ -72,7 +72,7 @@ If tools like package managers make the problem worse, does it mean the good way
 
 I'm not sure about that!
 
-Dependency management in C and C++ is problematic, but I think that the perception of the cost doesn't come from the intrinsic cost but by the fact that packages don't have an uniform interface. In other words, the C and C++ way consists of keeping packages hard to install to avoid things like dependency chains attacks. That definitely works, but isn't the optimal solution either.
+Dependency management in C and C++ is problematic, but I think that the perception of the cost doesn't come from the intrinsic cost but by the fact that packages don't have a uniform interface. In other words, the C and C++ way consists of keeping packages hard to install to avoid things like dependency chain attacks. That definitely works, but isn't the optimal solution either.
 
 ## Javascript and Python Programmers Are Wrong Too
 
@@ -80,18 +80,18 @@ Okay. So package manager ARE good?
 
 Not quite!
 
-Package managers do provide uniform interfaces for installation and management, but have the problem of discouting transitive dependencies by implementing a form of dependency encapsulation. In other words, when you ask `npm` to install a package, it will implicitly install all transitive dependencies and pretty much hide it from you.
+Package managers do provide uniform interfaces for installation and management, but have the problem of discounting transitive dependencies by implementing a form of dependency encapsulation. In other words, when you ask `npm` to install a package, it will implicitly install all transitive dependencies and pretty much hide it from you.
 
 ## A Better Way
 
 So basically C and C++ programmers are fighting the wrong war, while Javascript and Python programmers aren't even aware they are in one.
 
-Now that I succesfully put myself on everyone's bad side, I wonder: what is the better way?
+Now that I successfully put myself on everyone's bad side, I wonder: what is the better way?
 
-Generally speaking, we should find ways to remind ourselves of what dependencies are costing us, both in terms of complexity and how much we are exposing ourselves to risks of other organizations failiting to delivering what's expected.
+Generally speaking, we should find ways to remind ourselves of what dependencies are costing us, both in terms of complexity and how much we are exposing ourselves to risks of other organizations failing to delivering what's expected.
 
 A good starting point is the package manager. I'm convinced a good package manager should:
-* Implement an uniform package interface for easily installing and updating dependencies
+* Implement a uniform package interface for easily installing and updating dependencies
 * Not discount transitive dependencies by treating them as direct dependencies (users should need to manually install dependencies at all levels of indirection)
 * Be transparent and remind how much code each package is adding
 
@@ -99,7 +99,7 @@ A good starting point is the package manager. I'm convinced a good package manag
 
 Ultimately, this article is about making better software. While tools and practices matter, the most impactful factor is the individual's ability to write good code and make sound decisions. We rarely discuss this because there's no overnight solution. Building skills requires time.
 
-But how we spend that time matters a lot. Avoiding dependencies has the side-effect of making us grow as we try to solve hard problems, fail, and learn in the process. The software ecosystem is such that same problem problem often presents itself multiple times in different flavours. So as time goes by we tend to be in a much better spot than last time.
+But how we spend that time matters a lot. Avoiding dependencies has the side-effect of making us grow as we try to solve hard problems, fail, and learn in the process. The software ecosystem is such that same problem often presents itself multiple times in different flavours. So as time goes by, we tend to be in a much better spot than last time.
 
 So, in conclusion, the dependency problem isn't just about complexity, but also about us growing as programmers.
 
