@@ -1,6 +1,6 @@
 # The Dependency Problem
 
-When talking to other C or C++ programmers, I often find we share the assumption that "dependencies are bad". But when I look at other more mainstream programming communities I find that this is a much less popular opinion. For this reason I decided to write down my thoughts on the topic of dependencies to either disprove my assumptions or offer a better framing of the problem.
+When talking to other C or C++ programmers, I often find we share the assumption that "dependencies are bad". This doesn't seem to be the case in more mainstream programming communities where this isn't something people think about much. So I decided to take the time and reason about what's happening here. Are dependencies a problem? And if so, how does this issue come to be?
 
 ## Benefits of Code Reuse
 
@@ -54,10 +54,51 @@ The developers of D, E, F, G also want to leverage code reuse by adding their ow
 H   I   J   K   L   M   N   O
 ```
 
-In this example, the cost of dependencies grows exponentially as we add layers, doubling each time. But each node is only aware of what's beneath it, so they have no information of how much their dependencies are costing to the actual root program.  This is quite a simplistic example, but I think it shows the underlying principle that causes dependency graphs to grow.
+In this example, the cost of dependencies grows exponentially as we add layers, doubling each time. But each node is only aware of what's beneath it, so they have no information of how much their dependencies are costing to the actual root program.  This is quite a simplistic and pessimistic example as nodes are often shared, but I think it shows the underlying principle that causes dependency graphs to grow.
 
 Given this model the "dependencies are bad" heuristic makes more sense as you always design for the worst case.
 
-## Conclusion
+## Why the Divide?
 
-The root cause of this situation is assuming that code reuse has no downsides. The costs outweigh the benefits as projects grow larger. There needs to be a mindset shift from "I know a library for that" to first trying to solve problems yourself, and then looking for someone else's solution if necessary. If you do choose to add a dependency, you'll have a much better idea of what it's doing for you.
+But why do people in different communities have so different perceptions of the situation?
+
+I think programmers in the C and C++ communities are much more exposed to the problem due to how costly each dependency is and that there is no form of dependency encapsulation. When you use a library, you need to learn about its dependencies ad manually add them to the build process.
+
+On the other hand, the Python and Javascript communities have tools for that which greatly reduce the management cost. This makes adding dependencies to your project nearly effortless and the low resistance route whenever a problem comes up. As the software ecosystem grows, the network of dependencies does too, so that when things go wrong, [they go really wrong](https://en.wikipedia.org/wiki/Npm_left-pad_incident).
+
+## C and C++ Programmers Are Wrong
+
+If tools like package managers make the problem worse, does it mean the good way is the C and C++ way?
+
+I'm not sure about that!
+
+Dependency management in C and C++ is problematic, but I think that the perception of the cost doesn't come from the intrinsic cost but by the fact that packages don't have an uniform interface. In other words, the C and C++ way consists of keeping packages hard to install to avoid things like dependency chains attacks. That definitely works, but isn't the optimal solution either.
+
+## Javascript and Python Programmers Are Wrong Too
+
+Okay. So package manager ARE good?
+
+Not quite!
+
+Package managers do provide uniform interfaces for installation and management, but have the problem of discouting transitive dependencies by implementing a form of dependency encapsulation. In other words, when you ask `npm` to install a package, it will implicitly install all transitive dependencies and pretty much hide it from you.
+
+## A Better Way
+
+So basically C and C++ programmers are fighting the wrong war, while Javascript and Python programmers aren't even aware they are in one.
+
+Now that I succesfully put myself on everyone's bad side, I wonder: what is the better way?
+
+Generally speaking, we should find ways to remind ourselves of what dependencies are costing us, both in terms of complexity and how much we are exposing ourselves to risks of other organizations failiting to delivering what's expected.
+
+A good starting point is the package manager. I'm convinced a good package manager should:
+* Implement an uniform package interface for easily installing and updating dependencies
+* Not discount transitive dependencies by treating them as direct dependencies (users should need to manually install dependencies at all levels of indirection)
+* Be transparent and remind how much code each package is adding
+
+## Final Thoughts
+
+Ultimately, this article is about making better software. While tools and practices matter, the most impactful factor is the individual's ability to write good code and make sound decisions. We rarely discuss this because there's no overnight solution. Building skills requires time.
+
+But how we spend that time matters a lot. Avoiding dependencies has the side-effect of making us grow as we try to solve hard problems, fail, and learn in the process. The software ecosystem is such that same problem problem often presents itself multiple times in different flavours. So as time goes by we tend to be in a much better spot than last time.
+
+So, in conclusion, the dependency problem isn't just about complexity, but also about us growing as programmers.
