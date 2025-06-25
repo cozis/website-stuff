@@ -102,3 +102,8 @@ Ultimately, this article is about making better software. While tools and practi
 But how we spend that time matters a lot. Avoiding dependencies has the side-effect of making us grow as we try to solve hard problems, fail, and learn in the process. The software ecosystem is such that same problem problem often presents itself multiple times in different flavours. So as time goes by we tend to be in a much better spot than last time.
 
 So, in conclusion, the dependency problem isn't just about complexity, but also about us growing as programmers.
+
+## Join the Discussion!
+Have questions or feedback for me? Feel free to pop in my discord
+
+[Join the Discord Server](https://discord.gg/vCKkCWceYP)
