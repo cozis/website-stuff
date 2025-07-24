@@ -38,6 +38,8 @@ typedef struct {
     String surname;
 } Person;
 
+#define MAX_PEOPLE 100
+
 #define S(X) (String) { (X), (int) sizeof(X)-1 }
 
 int main(void)
@@ -159,7 +161,7 @@ bool consume_str(Scanner *s, String x)
     if (x.len == 0)
         return false;
 
-    if (x.len > s.len - s.cur)
+    if (x.len > s->len - s->cur)
         return false;
 
     for (int i = 0; i < x.len; i++)
@@ -419,7 +421,7 @@ bool consume_str(Scanner *s, String x)
     if (x.len == 0)
         return false;
 
-    if (x.len > s.len - s.cur)
+    if (x.len > s->len - s->cur)
         return false;
 
     for (int i = 0; i < x.len; i++)
